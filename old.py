@@ -67,7 +67,7 @@ def corrigir_doc(string: str):
         #call the function that clean the "bugged" segment
         clean_current_segment = corrigir_palavra(bugged_segment)
 
-        if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_segment.lower() != clean_current_segment.lower() for clean_segment in clean_segments]):
+        if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_segment != clean_current_segment for clean_segment in clean_segments]):
             clean_segments.append(clean_current_segment)
 
         '''#initialize anagram check boolean
@@ -133,12 +133,9 @@ def obter_pin(sequences: tuple):
 
     #check if the input follow every rule... (CBDE)
     for sequence in sequences:
-        if sequence == "":
-            raise ValueError("obter_pin: argumento invalido")
-        else:
-            for movement in sequence:
-                if movement not in valid_movements:
-                    raise ValueError("obter_pin: argumento invalido")
+        for movement in sequence:
+            if movement not in valid_movements:
+                raise ValueError("obter_pin: argumento invalido")
 
     #initialize an empty tuple to save the pin
     pin = ()
@@ -166,7 +163,7 @@ def obter_pin(sequences: tuple):
 # -- Verificação de dados -- #
 
 def eh_entrada(entrada: tuple):
-    if type(entrada) != tuple or len(entrada) != 3:
+    if type(entrada) != tuple:
         return False
 
     #initialize variables
@@ -174,20 +171,20 @@ def eh_entrada(entrada: tuple):
     checksum = entrada[1]
     tuplo = entrada[2]
 
+    #"--" check
+    if cifra.count("--") > 0:
+        return False
 
-    segments = cifra.split("-")
+
+    joined_cifra = cifra.replace("-", "")
 
     #alpha and low case check
-    for segment in segments:
-        if segment == "":
+    for letter in joined_cifra:
+        if not letter.isalpha() or not letter.islower():
             return False
 
-        for letter in segment:
-            if not letter.isalpha() or not letter.islower():
-                return False
-
     #checksum check
-    if type(checksum) == str and len(checksum) == 7 and checksum[0] == "[" and checksum[-1] == "]":
+    if checksum[0] == "[" and checksum[-1] == "]" and len(checksum) == 7:
         for letter in checksum[1:-1]:
             if not letter.isalpha() or not letter.islower():
                 return False
@@ -197,7 +194,7 @@ def eh_entrada(entrada: tuple):
     #tuplo check
     if type(tuplo) == tuple and len(tuplo) >= 2:
         for elemento in tuplo:
-            if type(elemento) != int or elemento < 0:
+            if type(elemento) != int:
                 return False
     else:
         return False
@@ -207,53 +204,48 @@ def eh_entrada(entrada: tuple):
 
 def validar_cifra(cifra:str, checksum:str):
     
+    def sort_funct(key):
+        #this function sort the list based on how common the letter is in the cifra and based on alphabetic order to resolve draws
+        return common_dictionary[key] - ord(key)
+
     control = checksum[1:-1]
+
+    #replace "-" with "" so that I can go trough all of the letters like a single string
     joined_cifra = cifra.replace("-", "")
 
-    ordered = []
+    common_dictionary = {}
 
-    #we want the 5 letters that are the most common and undraw by alphabetic order
-    for _ in range(5):
-        #start by defining a list that contains on the index 0 the best letter and on the index 1 the number of times that the letter appeared
-        best = ["", 0]
-        for letter in joined_cifra:
+    for letter in joined_cifra:
+        if letter not in common_dictionary:
+            common_dictionary.update({
+                letter: joined_cifra.count(letter)
+                })
 
-            #number of times the letter we are testing appear on the string
-            letter_count = joined_cifra.count(letter)
-            
-            if letter_count > best[1]:
-                best = [letter, letter_count]
-            elif letter_count == best[1]:
-                if ord(letter) < ord(best[0]):
-                    best = [letter, letter_count]
+    #reorganizar a list
+    order_list = sorted(common_dictionary, key=sort_funct, reverse=True)
 
-        #add to the list the best caracter
-        ordered.append(best[0])
-
-        #remove the caracter that we just added from the strings
-        joined_cifra = joined_cifra.replace(best[0], "")
-
-
-    #check if the control list correspond to the best order list and return boolean
-    result = list(control) == ordered 
+    #control should be equal to the first 5 caracters of the order_list
+    result = list(control) == order_list[:5]
 
     return result
-
 
 def filtrar_bdb(entradas: list):
 
     if type(entradas) != list or len(entradas) < 1:
-        raise ValueError("filtrar_bdb: argumento invalido")
+        raise ValueError("filtrar bdb: argumento invalido")
 
-    #is this supposed to be here?
+    '''#--TODO: is this supposed to be here?
     for entrada in entradas:
         if not eh_entrada(entrada):
-            raise ValueError("filtrar_bdb: argumento invalido")
+            raise ValueError("filtrar bdb: argumento invalido")'''
 
     #define the filter function
     def filter_funct(entrada):
+ 
+        #we want to filter and get only the ones that are wrong so we will return True if the "entrada" is not OK and False if the "entrada" is OK
+        if not eh_entrada(entrada):
+            return True
 
-        #validar_cifra will return True if the cifra is correct but because we want the ones that are not correct we need to "change" the boolean so the filter function returns True if the cifra is not valid
         res = not validar_cifra(entrada[0], entrada[1])
 
         return res
@@ -364,11 +356,11 @@ def eh_utilizador(dictionary: dict):
     except:
         return False
     
-    
     #verify names and passwords
-    if len(name) < 1 or len(passw) < 1 or len(char) != 1 or type(vals) != tuple or len(vals) != 2 or (vals[0] > vals[1]) :
+    if len(name) < 1 or len(passw) < 1 or len(char) < 1 or type(vals) != tuple or (vals[0] > vals[1]):
         return False 
-    
+
+
     #else
     return True
 
@@ -442,3 +434,5 @@ def filtrar_senhas(lista: list):
 
     
 #---------------------------#
+
+print(filtrar_bdb([100]))
