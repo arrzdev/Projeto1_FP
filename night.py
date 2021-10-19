@@ -174,10 +174,14 @@ def eh_entrada(entrada: tuple):
     checksum = entrada[1]
     tuplo = entrada[2]
 
+    #check types of the variables
+    if type(cifra) != str or type(checksum) != str or type(tuplo) != tuple:
+        return False
 
+    #get the segments of the cifra that we will use for the tests
     segments = cifra.split("-")
 
-    #alpha and low case check
+    #cifra alpha and low case check 
     for segment in segments:
         if segment == "":
             return False
@@ -186,13 +190,14 @@ def eh_entrada(entrada: tuple):
             if not letter.isalpha() or not letter.islower():
                 return False
 
-    #checksum check
-    if type(checksum) == str and len(checksum) == 7 and checksum[0] == "[" and checksum[-1] == "]":
-        for letter in checksum[1:-1]:
-            if not letter.isalpha() or not letter.islower():
-                return False
-    else:
+    #check lenght and format of checksum
+    if len(checksum) != 7 or checksum[0] != "[" or checksum[-1] != "]":
         return False
+
+    #checksum alpha and low case check
+    for letter in checksum[1:-1]:
+        if not letter.isalpha() or not letter.islower():
+            return False
 
     #tuplo check
     if type(tuplo) == tuple and len(tuplo) >= 2:
@@ -363,21 +368,20 @@ def eh_utilizador(dictionary: dict):
         char = dictionary["rule"]["char"]
     except:
         return False
+    
+    
+    #verify's
 
-    #verify types of the keys
-    if type(name) != str or type(passw) != str or type(vals) != tuple or type(char) != str:
+    #name and passwrd check
+    if len(name) < 1 or len(passw) < 1:
         return False
-
-    #verify lengths
-    if len(name) < 1 or len(passw) < 1 or len(vals) != 2 or len(char) != 1:
-        return False
-
-    #char alpha and lower case check
-    if not char.isalpha():
+    
+    #char check
+    if len(char) != 1 or not char.isalpha():
         return False
 
     #vals check
-    if type(vals[0]) != int or type(vals[1]) != int or vals[0] < 1 or vals[1] < 1 or vals[0] > vals[1]:
+    if type(vals) != tuple or len(vals) != 2 or type(vals[0]) != int or type(vals[1]) != int or vals[0] > vals[1]:
         return False
     
     #else
