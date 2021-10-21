@@ -1,59 +1,95 @@
 
+
+
+'''
+   Send a message to a recipient
+
+   :param str segment: The person sending the message
+   :param str recipient: The recipient of the message
+   :param str message_body: The body of the message
+   :param priority: The priority of the message, can be a number 1-5
+   :type priority: integer or None
+   :return: the message id
+   :rtype: int
+   :raises ValueError: if the message_body exceeds 160 characters
+   :raises TypeError: if the message_body is not a basestring
+   '''
+
 # -- Correção de documentação -- #
 
-def corrigir_palavra(segment: str): 
-    #This function clean the bugs that are in a segment of caracters..
+def corrigir_palavra(segment: str) -> str: 
+    '''
+   This function receives a segment containing "trash" and cleans it returning the cleaned segment
+   Example: "cCdatabasacCADde" should return "database"
+
+    - param str segment: segment that contains the "trash"   
+   '''
 
     letter_index = 0
 
-    while letter_index < len(segment):
-        #the current letter that we are checking
+    #here we are going from 1 to len(segment)-1 because we don't want to test the last letter since we don't have any letter after it.
+    while letter_index < len(segment)-1:
+        
+        #store the current letter and the next letter into 2 variables
         current_letter = segment[letter_index]
+        next_letter = segment[letter_index+1]
 
-        #the letter that need to be next so that we have the pattern
-        if current_letter.islower():
-            next_pattern_letter = current_letter.upper()
+        #here we are converting the letters to ASCII code and checking if the modulo of the diference between them are 32 (difference between lower and capital in ASCII)
+        if abs(ord(current_letter) - ord(next_letter)) == 32:
+            letters_to_remove = current_letter + next_letter
+            segment = segment.replace(letters_to_remove, "")
+            
+            # in case of a "hit" remove 1 from letter_index so we can test the letter that is before the current letter again. Since we removed some "trash" it's possible that we "created" new trash. For example: ("ABba")
+            letter_index -= 1
         else:
-            next_pattern_letter = current_letter.lower()
-    
-        #if we are not checking the last letter and if the next letter is the one that we need to have a "pattern"
-        if letter_index != len(segment)-1 and segment[letter_index+1] == next_pattern_letter:
-            segment = segment.replace(current_letter+next_pattern_letter, "")
-
-            #if we have removed a "pattern" we go back 1 in the index so we can test the letter before that can now have a pattern based on the modification that we just did
-            if letter_index >= 1:
-                letter_index -= 1
-        else: #keep searching forward if we don't remove any thing
+            #otherwise keep going trough the letters
             letter_index += 1
 
+    #return the clean segment
     return segment
 
-def eh_anagrama(segment1: str, segment2: str):
-    #This function returns True or False based on the segment1 and the segment2 being anagrams or not
+def eh_anagrama(segment1: str, segment2: str) -> bool:
+    '''
+    This function returns a boolean, True if the segment1 and segment2 are anagrams, False other wise.
+    This function is case insensitive.
+    Example: "Caso", "Saco" should return True; "saco", "sacos" should return False 
+    '''
 
-    #the sorted method creates a list with ordenated caracters
+    #convert all letters of both segments to lower case letters
+    segment1 = segment1.lower()
+    segment2 = segment2.lower()
 
-    res = sorted(segment1.lower()) == sorted(segment2.lower())
+    #use the built-in sorted method to "create" a sorted list of the letters and compare the lists 
+    res = sorted(segment1) == sorted(segment2)
 
     return res
 
-def corrigir_doc(string: str):
-    #This function receives the documentation and clean it removing the bugs
+def corrigir_doc(string: str) -> str:
+    '''
+    This function receives a string containing segments separated by a space. This segments can contain trash so we "send" each segment to the function corrigir_palavra() and after cleaning all of the segments join them together (basically removing all the trash in the received string), we exclude from the segments that will be joined the ones that are anagrams of any segment that is present before them (we dont consider equal segments anagrams).
+    Example: "JlLjbaoOsuUeYy cChgGvValLCwMmWBbclLsNn" should return "base has"
+    '''
 
     #string check
+
+    #AQUI deixo assim, ou tiro aquilo lá de dentro e mudo a identeção?
     if type(string) == str:
         #create a list containing the bugged bugged_segments
         bugged_segments = string.split()
 
-        #spaces check
+        #--Professor: esta verificaçãio não está a ser realizada em nenhum teste no mooshak? é suposto manter?
+
+        #check if the segments are separated by 1 or more white spaces and raise Error if that happen
+
+        #AQUI meto if string.count("  ") ou deixo assim?
         if string.count("  ") > 0:
             raise ValueError("corrigir_doc: argumento invalido")
             
-        #at least 1 letter and only letterns in each segment check
+        #check if every caracter is the segment is a letter (lower case or upper case)
         for bugged_segment in bugged_segments:
-            for caracter in bugged_segment:
-                if not caracter.isalpha():
-                    raise ValueError("corrigir_doc: argumento invalido")
+            if not bugged_segment.isalpha():
+                raise ValueError("corrigir_doc: argumento invalido")
+    
     else:
         raise ValueError("corrigir_doc: argumento invalido")
 
@@ -61,15 +97,17 @@ def corrigir_doc(string: str):
     #initialize an empty list where we are going to save our clean segments
     clean_segments = []
 
-    #loop throught the bugged segments
     for bugged_segment in bugged_segments:
-
         #call the function that clean the "bugged" segment
         clean_current_segment = corrigir_palavra(bugged_segment)
 
+        #here I am using the any method and list comprehension to check if there is any segment that is an anagram of the current cleaned segment
+        #here we do not consider equal segments as anagrams also we need to convert that to lower before checking  
+        #AQUI
         if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_segment.lower() != clean_current_segment.lower() for clean_segment in clean_segments]):
             clean_segments.append(clean_current_segment)
 
+        #AQUI colocar isto invés do any/list comprehension
         '''#initialize anagram check boolean
         any_anagram = False
 
@@ -85,7 +123,7 @@ def corrigir_doc(string: str):
             clean_segments.append(clean_current_segment)
         '''
 
-    #join the segments and build the cleaned string
+    #join the cleaned segments and build the cleaned string
     cleaned_string = " ".join(clean_segments)
 
     return cleaned_string
@@ -95,16 +133,28 @@ def corrigir_doc(string: str):
 
 # -- Descoberta do PIN -- #
 
-def obter_posicao(movement: str, position: int):
-    
+def obter_posicao(movement: str, position: int) -> int:
+    '''
+    This function receives a position and a movement and returns the position after "moving", here we consider "C" as going Up, "B" as going down, "E" as going left and "D" as going right. If we are on the edge of the board we stay in the same place.
+    Example: "C", 5 should return 2
+
+    - param str movement: "type" of moving we are making
+    - param int position: position on the board that we are moving from
+    '''
+
+    #here we define the board limits for each movement
+    #AQUI: eu acho que usando board era mais dificil de implementar devido à logica mas se for melhor o farei.
+    #board = [[1,2,3],[4,5,6],[7,8,9]]
+
     C_limit = (1,2,3)
     B_limit = (7,8,9)
     E_limit = (1,4,7)
     D_limit = (3,6,9)
-
-    #CBED
      
+    #logic to check the next position based on the position we are moving from and the movement
     if movement == "C" and position not in C_limit:
+        #AQUI: isto é obvio necessito de deixar estes comentarios?
+        #to get the position above the current position we need to subtract 3 from the current position
         new_position = position - 3
     elif movement == "B" and position not in B_limit:
         new_position = position + 3
@@ -117,13 +167,32 @@ def obter_posicao(movement: str, position: int):
 
     return new_position
 
-def obter_digito(sequence: str, position: int):
+def obter_digito(sequence: str, position: int) -> int:
+    '''
+    This function receives a sequence of movements and a starting position and return the position that we end with after all the moves.
+    Example: "CEE", 5 should return 1
+
+    - param str sequence: sequence of movements that will be looped through to get the last position
+    - param int position: starting position
+    '''
+    
+    #go through all the movements in the sequence and using the function "obter_posicao()" get the new position 
     for movement in sequence:
         position = obter_posicao(movement, position)
 
+    #return the last position that we end with
     return position
 
-def obter_pin(sequences: tuple):
+def obter_pin(sequences: tuple) -> tuple:
+    '''
+    This function receives some sequences of movements and returns a pin, each sequence corresponds to 1 digit in the pin.
+    Example: "CEE", "DDBBB", "ECDBE", "CCCCB" should return (1, 9, 8, 5)
+
+    - param tuple sequences: a tuple that contain the sequences of movements
+    '''
+
+
+    #AQUI: neste tipo de verificações fica mais explicito assim ou se colocasse por exemplo if not(type(sequences) == tuple and len(sequences) > 4 and len(sequences) < 10);
 
     #check type and lenght of the argument "sequences"
     if type(sequences) != tuple or len(sequences) < 4 or len(sequences) > 10:
@@ -131,8 +200,9 @@ def obter_pin(sequences: tuple):
     
     valid_movements = ("C","B","E","D")
 
-    #check if the input follow every rule... (CBDE)
+    #check if the received sequences do not have invalid movements
     for sequence in sequences:
+        #sequence can't be an empty string..
         if sequence == "":
             raise ValueError("obter_pin: argumento invalido")
         else:
@@ -143,21 +213,19 @@ def obter_pin(sequences: tuple):
     #initialize an empty tuple to save the pin
     pin = ()
 
-    #initialize the position variable with 5 (middle)
+    #initialize a variable with the "standard/starting" position (middle)
     position = 5
 
-    #loop through the sequence
     for sequence in sequences:
         #update the position with the new position
         position = obter_digito(sequence, position)
 
-        #create a tuple containing the digito 
+        #create a tuple (digito) containing the position that we ended on after running the sequence of movements
         digito = (position,)
 
-        #concatenate the two tuples
+        #concatenate the two tuples to add the digito to the pins 
         pin += digito
 
-    #return the pin
     return pin
 
 #-------------------------#
@@ -165,7 +233,11 @@ def obter_pin(sequences: tuple):
 
 # -- Verificação de dados -- #
 
-def eh_entrada(entrada: tuple):
+def eh_entrada(entrada: tuple) -> bool:
+    '''
+    WE ENDED HERE
+    '''
+
     if type(entrada) != tuple or len(entrada) != 3:
         return False
 
@@ -386,7 +458,7 @@ def eh_utilizador(dictionary: dict):
 def eh_senha_valida(password: str, rule: dict):
     #gerais
 
-    vowels = ["a", "e", "i", "o", "u"]
+    vowels = ("a", "e", "i", "o", "u")
 
     #initialize variable that stores the number of vowels that are present in the password
     vowels_number = 0
@@ -431,11 +503,8 @@ def filtrar_senhas(lista: list):
     
 
     def filter_funct(dictionary):
-        #we want the dictionarys that have wrong passwords so return True when the passwords are wrong, return False otherwise
-        if not eh_senha_valida(dictionary["pass"], dictionary["rule"]):
-            return True
-        else:
-            return False
+        #since the eh_senha_valida return True if it is correct we return the opposite of the received boolean, because we want the wrong 
+        return not eh_senha_valida(dictionary["pass"], dictionary["rule"])
 
     def map_funct(dictionary):
         return dictionary["name"]
@@ -451,5 +520,4 @@ def filtrar_senhas(lista: list):
 
     return ordenated_names
 
-    
 #---------------------------#
