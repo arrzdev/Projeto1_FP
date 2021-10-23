@@ -33,6 +33,12 @@ class TestDocumentacao1(unittest.TestCase):
         """
         self.assertEqual('x', target.corrigir_palavra('abBAx'))
 
+    def test_corrigir_palavra_3(self):
+        self.assertEqual('', target.corrigir_palavra('aaDBbdAcCeEA'))
+
+    def test_corrigir_palavra_4(self):
+        self.assertEqual('Ol', target.corrigir_palavra('OlaA'))
+
     def test_eh_anagrama_1(self):
         """
         Exemplo enunciado (caso, SaCo)
@@ -63,6 +69,53 @@ class TestDocumentacao1(unittest.TestCase):
         self.assertEqual('Buggy data base has wrong data',
                          target.corrigir_doc(doc))
 
+    def test_corrigir_doc_3(self):
+        """
+        Exemplo enunciado (Programacao e programacao)
+        """
+        doc = 'Programacao porgramacao e programacao'
+        self.assertEqual('Programacao e programacao',
+                         target.corrigir_doc(doc))
+    
+    def test_corrigir_doc_4(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.corrigir_doc('Dois  espa�os')
+        self.assertEqual('corrigir_doc: argumento invalido',
+                         str(ctx.exception))
+    
+    def test_corrigir_doc_5(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.corrigir_doc(1)
+        self.assertEqual('corrigir_doc: argumento invalido',
+                         str(ctx.exception))
+
+    def test_corrigir_doc_6(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.corrigir_doc('')
+        self.assertEqual('corrigir_doc: argumento invalido',
+                         str(ctx.exception))
+
+    def test_corrigir_doc_7(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.corrigir_doc('letr4s e numer0s')
+        self.assertEqual('corrigir_doc: argumento invalido',
+                         str(ctx.exception))
+    
+    def test_corrigir_doc_8(self):
+        doc = 'Programacao Programacao porgramacao'
+        self.assertEqual('Programacao Programacao',
+                         target.corrigir_doc(doc))
+    
+    def test_corrigir_doc_9(self):
+        doc = 'Programacao com objetos e bojetos'
+        self.assertEqual('Programacao com objetos e',
+                         target.corrigir_doc(doc))
+
+    def test_corrigir_doc_10(self):
+        doc = 'Era la suma souvenir del universo la inmaculada briosa y sobria marioneta danesa de adanes'
+        self.assertEqual('Era la suma souvenir del la inmaculada briosa y marioneta danesa de',
+                         target.corrigir_doc(doc))
+    
 
 class TestPIN2(unittest.TestCase):
     def test_obter_posicao_1(self):
@@ -172,6 +225,195 @@ class TestPIN2(unittest.TestCase):
 
     def test_obter_posicao_36(self):
         self.assertEqual(8, target.obter_posicao('D', 7))
+
+    def test_obter_pin_1(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.obter_pin(1)
+        self.assertEqual('obter_pin: argumento invalido',
+                         str(ctx.exception))
+    
+    def test_obter_pin_2(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.obter_pin(('E','C','D'))
+        self.assertEqual('obter_pin: argumento invalido',
+                         str(ctx.exception))
+
+    def test_obter_pin_3(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.obter_pin(('E','C','D','E','C','D','E','C','D','E','C'))
+        self.assertEqual('obter_pin: argumento invalido',
+                         str(ctx.exception))
+
+    def test_obter_pin_4(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.obter_pin(('z','E','C','D'))
+        self.assertEqual('obter_pin: argumento invalido',
+                         str(ctx.exception))
+    
+    def test_obter_pin_5(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.obter_pin(('', 'E', 'C', 'D'))
+        self.assertEqual('obter_pin: argumento invalido',
+                         str(ctx.exception))
+
+
+class TestVerificacaoDados3(unittest.TestCase):
+    def test_eh_entrada_1(self):
+        self.assertFalse(target.eh_entrada(1))
+
+    def test_eh_entrada_2(self):
+        self.assertFalse(target.eh_entrada(('a','b')))
+
+    def test_eh_entrada_3(self):
+        self.assertFalse(target.eh_entrada(('','[aaaaa]',(1,2))))
+
+    def test_eh_entrada_4(self):
+        self.assertFalse(target.eh_entrada(('A','[aaaaa]',(1,2))))
+
+    def test_eh_entrada_5(self):
+        self.assertFalse(target.eh_entrada(('aa', '', (1,2))))
+
+    def test_eh_entrada_6(self):
+        self.assertFalse(target.eh_entrada(('aa', 'abcdefg', (1,2))))
+
+    def test_eh_entrada_7(self):
+        self.assertFalse(target.eh_entrada(('aa', '[abcdef', (1,2))))
+
+    def test_eh_entrada_8(self):
+        self.assertFalse(target.eh_entrada(('aa', '[aaaaa]', ())))
+
+    def test_eh_entrada_9(self):
+        self.assertFalse(target.eh_entrada(('aa', '[aaaaa]', ('a',2))))
+
+    def test_eh_entrada_10(self):
+        self.assertFalse(target.eh_entrada(('aa', '[aaaaa]', (-1,2))))
+
+    def test_validar_cifra_1(self):
+        self.assertTrue(target.validar_cifra('zzz-yyy-ccc-aaa-bbb', '[abcyz]'))
+
+    def test_validar_cifra_2(self):
+        self.assertTrue(target.validar_cifra('zzz-bb-aa-d-c', '[zabcd]'))
+
+    def test_filtrar_bdb_1(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.filtrar_bdb(1)
+        self.assertEqual('filtrar_bdb: argumento invalido',
+                         str(ctx.exception))
+
+    def test_filtrar_bdb_2(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.filtrar_bdb([('aaaaa-bbb-zx-yz-xy', '[]',(950,300))])
+        self.assertEqual('filtrar_bdb: argumento invalido',
+                         str(ctx.exception))
+    
+    def test_filtrar_bdb_3(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.filtrar_bdb([('aaaaa-bbb-zx-yz-xy', '[abxyz]')])
+        self.assertEqual('filtrar_bdb: argumento invalido',
+                         str(ctx.exception))
+
+    def test_filtrar_bdb_4(self):
+        self.assertEqual([], target.filtrar_bdb([('aaaaa-bbb-zx-yz-xy', '[abxyz]', (950, 300))]))
+
+    def test_filtrar_bdb_5(self):
+        self.assertEqual([('a-b-c-d-e-f-g-h', '[xxxxx]', (124, 325, 7)), ('entrada-muito-errada', '[abcde]', (50, 404))], target.filtrar_bdb([('aaaaa-bbb-zx-yz-xy', '[abxyz]', (950, 300)), ('a-b-c-d-e-f-g-h', '[xxxxx]', (124, 325, 7)), ('entrada-muito-errada', '[abcde]', (50, 404))]))
+
+
+class TesteDesencriptacaoDeDados4(unittest.TestCase):
+    def test_obter_num_seguranca_1(self):
+        self.assertEqual(9, target.obter_num_seguranca((1, 10, 100)))
+
+    def test_obter_num_seguranca_2(self):
+        self.assertEqual(9, target.obter_num_seguranca((100, 1, 10)))
+
+    def test_obter_num_seguranca_3(self):
+        self.assertEqual(9, target.obter_num_seguranca((100, 10, 1)))
+
+    def test_obter_num_seguranca_4(self):
+        self.assertEqual(351, target.obter_num_seguranca((420, 69, 31415)))
+
+    def test_obter_num_seguranca_5(self):
+        self.assertEqual(9, target.obter_num_seguranca((1, 100, 10)))
+    
+    def test_obter_num_seguranca_6(self):
+        self.assertEqual(9, target.obter_num_seguranca((10, 100, 1)))
+
+    def test_obter_num_seguranca_7(self):
+        self.assertEqual(9, target.obter_num_seguranca((10, 1, 100)))
+
+    def test_decifrar_texto_1(self):
+        self.assertEqual('esta cifra e quase inquebravel', target.decifrar_texto('qgfo-qutdo-s-egoes-wzegsnfmjqz', 325))
+
+    def test_decifrar_texto_2(self):
+        self.assertEqual('bpqx zfcox b nrxpb fknrbyoxsbi', target.decifrar_texto('qgfo-qutdo-s-egoes-wzegsnfmjqz', 10))
+
+    def test_decifrar_bdb_1(self):
+        with self.assertRaises(ValueError, msg='ValueError not raised') as ctx:
+            target.decifrar_bdb(1)
+        self.assertEqual('decifrar_bdb: argumento invalido',
+                         str(ctx.exception))
+
+
+class TestDepuracao5(unittest.TestCase):
+    def test_eh_utilizador_1(self):
+        """
+        Exemplo enunciado {'name':'john.doe','pass':'aabcde','rule':{'vals':(1,3),'char':'a'}}
+        """
+        self.assertTrue(target.eh_utilizador({'name':'john.doe','pass':'aabcde','rule':{'vals':(1,3),'char':'a'}}))
+
+    def test_eh_utilizador_2(self):
+        """
+        Exemplo enunciado {'name':'john.doe','pass':'aabcde','rule':{'vals':1,'char':'a'}}
+        """
+        self.assertFalse(target.eh_utilizador({'name':'john.doe','pass':'aabcde','rule':{'vals':1,'char':'a'}}))
+
+    def test_eh_utilizador_3(self):
+        """
+        Exemplo enunciado {'name':'bruce','surname':'wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}
+        """
+        self.assertFalse(target.eh_utilizador({'name':'bruce','surname':'wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}))
+
+    def test_eh_utilizador_4(self):
+        """
+        Exemplo enunciado {'pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}
+        """
+        self.assertFalse(target.eh_utilizador({'pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}))
+
+    def test_eh_utilizador_5(self):
+        """
+        Exemplo enunciado {'name':'','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}
+        """
+        self.assertFalse(target.eh_utilizador({'name':'','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}))
+
+    def test_eh_utilizador_6(self):
+        """
+        Exemplo enunciado {'name':'bruce.wayne','pass':'mynameisbatman','rule':{}}
+        """
+        self.assertFalse(target.eh_utilizador({'name':'bruce.wayne','pass':'mynameisbatman','rule':{}}))
+
+    def test_eh_utilizador_7(self):
+        """
+        Exemplo enunciado {'name':'bruce.wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'ma'}}
+        """
+        self.assertFalse(target.eh_utilizador({'name':'bruce.wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'ma'}}))
+
+    def test_eh_utilizador_8(self):
+        """
+        Exemplo enunciado {'name':'bruce.wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}
+        """
+        self.assertTrue(target.eh_utilizador({'name':'bruce.wayne','pass':'mynameisbatman','rule':{'vals':(2,8),'char':'m'}}))
+    
+    def test_eh_senha_valida_1(self):
+        """
+        Exemplo enunciado ('aabcd', {'vals': (1,3), 'char':'a'})
+        """
+        self.assertTrue(target.eh_senha_valida('aabcde', {'vals': (1, 3), 'char': 'a'}))
+
+    def test_eh_senha_valida_2(self):
+        """
+        Exemplo enunciado ('cdefgh', {'vals': (1,3), 'char':'b'})
+        """
+        self.assertFalse(target.eh_senha_valida('cdefgh', {'vals': (1, 3), 'char': 'b'}))
 
 
 #######################################################

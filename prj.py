@@ -1,29 +1,21 @@
-
-
-
-'''
-   Send a message to a recipient
-
-   :param str segment: The person sending the message
-   :param str recipient: The recipient of the message
-   :param str message_body: The body of the message
-   :param priority: The priority of the message, can be a number 1-5
-   :type priority: integer or None
-   :return: the message id
-   :rtype: int
-   :raises ValueError: if the message_body exceeds 160 characters
-   :raises TypeError: if the message_body is not a basestring
-   '''
+#TODO: retirar aquelas identeções que o stor disse
 
 # -- Correção de documentação -- #
 
 def corrigir_palavra(segment: str) -> str: 
     '''
-   This function receives a segment containing "trash" and cleans it returning the cleaned segment
-   Example: "cCdatabasacCADde" should return "database"
+    Function to clean a segment
+    
+    This function receives a segment of caracters with some "errors" and cleans it
 
-    - param str segment: segment that contains the "trash"   
-   '''
+    Parameters
+    ----------
+    - segment: str
+    \n\tsegment/word that are incorrect and need to be fixed
+    Examples
+    --------
+    "cCdatabasacCADde" -> "database"
+    '''
 
     letter_index = 0
 
@@ -50,31 +42,51 @@ def corrigir_palavra(segment: str) -> str:
 
 def eh_anagrama(segment1: str, segment2: str) -> bool:
     '''
+    Function to check if two segments of caracters are anagrams
+    
+    This function returns a boolean.
+    True if the segment1 and segment2 are anagrams, False other wise.
+    This function is case insensitive.
+
+
+    Parameters
+    ----------
+    - segment: str
+    \n\tsegment/word that are incorrect and need to be fixed
+    Examples
+    --------
+    "cCdatabasacCADde" -> "database"
+    '''
+    
+    '''
     This function returns a boolean, True if the segment1 and segment2 are anagrams, False other wise.
     This function is case insensitive.
-    Example: "Caso", "Saco" should return True; "saco", "sacos" should return False 
+
+    Example: "Caso", "Saco" -> True; "saco", "sacos" -> False 
     '''
 
     #convert all letters of both segments to lower case letters
     segment1 = segment1.lower()
     segment2 = segment2.lower()
 
+    if segment1 != segment2:
     #use the built-in sorted method to "create" a sorted list of the letters and compare the lists 
-    res = sorted(segment1) == sorted(segment2)
-
-    return res
+        return sorted(segment1) == sorted(segment2)
+    else:
+        return False
 
 def corrigir_doc(string: str) -> str:
     '''
     This function receives a string containing segments separated by a space. This segments can contain trash so we "send" each segment to the function corrigir_palavra() and after cleaning all of the segments join them together (basically removing all the trash in the received string), we exclude from the segments that will be joined the ones that are anagrams of any segment that is present before them (we dont consider equal segments anagrams).
-    Example: "JlLjbaoOsuUeYy cChgGvValLCwMmWBbclLsNn" should return "base has"
+
+    Example: "JlLjbaoOsuUeYy cChgGvValLCwMmWBbclLsNn" -> "base has"
     '''
 
     #string check
 
     #AQUI deixo assim, ou tiro aquilo lá de dentro e mudo a identeção?
-    if type(string) == str:
-        #create a list containing the bugged bugged_segments
+    if type(string) == str and len(string) > 0:
+
         bugged_segments = string.split()
 
         #--Professor: esta verificaçãio não está a ser realizada em nenhum teste no mooshak? é suposto manter?
@@ -82,10 +94,9 @@ def corrigir_doc(string: str) -> str:
         #check if the segments are separated by 1 or more white spaces and raise Error if that happen
 
         #AQUI meto if string.count("  ") ou deixo assim?
-        if string.count("  ") > 0:
+        if string.count("  ") > 0: 
             raise ValueError("corrigir_doc: argumento invalido")
             
-        #check if every caracter is the segment is a letter (lower case or upper case)
         for bugged_segment in bugged_segments:
             if not bugged_segment.isalpha():
                 raise ValueError("corrigir_doc: argumento invalido")
@@ -93,41 +104,19 @@ def corrigir_doc(string: str) -> str:
     else:
         raise ValueError("corrigir_doc: argumento invalido")
 
-
-    #initialize an empty list where we are going to save our clean segments
     clean_segments = []
 
     for bugged_segment in bugged_segments:
-        #call the function that clean the "bugged" segment
         clean_current_segment = corrigir_palavra(bugged_segment)
 
-        #here I am using the any method and list comprehension to check if there is any segment that is an anagram of the current cleaned segment
-        #here we do not consider equal segments as anagrams also we need to convert that to lower before checking  
-        #AQUI
-        if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_segment.lower() != clean_current_segment.lower() for clean_segment in clean_segments]):
+        #TOADD
+        if not any([eh_anagrama(clean_segment, clean_current_segment) for clean_segment in clean_segments]):
             clean_segments.append(clean_current_segment)
-
-        #AQUI colocar isto invés do any/list comprehension
-        '''#initialize anagram check boolean
-        any_anagram = False
-
-        #loop throught the clean segments and make the anagram verify
-        for clean_segment in clean_segments:
-
-            #if the current clean_segment is an anagram of any already saved clean segment and they have not the same caracter order change anagram_check to True
-            if eh_anagrama(clean_segment, clean_current_segment) and clean_segment != clean_current_segment:
-                any_anagram = True
-
-        #append the recently cleaned segment to the list if it isn't an anagram of any of the previous saved cleaned segments
-        if not any_anagram:
-            clean_segments.append(clean_current_segment)
-        '''
 
     #join the cleaned segments and build the cleaned string
     cleaned_string = " ".join(clean_segments)
 
     return cleaned_string
-
 #--------------------------------#
 
 
@@ -136,7 +125,7 @@ def corrigir_doc(string: str) -> str:
 def obter_posicao(movement: str, position: int) -> int:
     '''
     This function receives a position and a movement and returns the position after "moving", here we consider "C" as going Up, "B" as going down, "E" as going left and "D" as going right. If we are on the edge of the board we stay in the same place.
-    Example: "C", 5 should return 2
+    Example: "C", 5 -> 2
 
     - param str movement: "type" of moving we are making
     - param int position: position on the board that we are moving from
@@ -170,7 +159,7 @@ def obter_posicao(movement: str, position: int) -> int:
 def obter_digito(sequence: str, position: int) -> int:
     '''
     This function receives a sequence of movements and a starting position and return the position that we end with after all the moves.
-    Example: "CEE", 5 should return 1
+    Example: "CEE", 5 -> 1
 
     - param str sequence: sequence of movements that will be looped through to get the last position
     - param int position: starting position
@@ -186,7 +175,7 @@ def obter_digito(sequence: str, position: int) -> int:
 def obter_pin(sequences: tuple) -> tuple:
     '''
     This function receives some sequences of movements and returns a pin, each sequence corresponds to 1 digit in the pin.
-    Example: "CEE", "DDBBB", "ECDBE", "CCCCB" should return (1, 9, 8, 5)
+    Example: "CEE", "DDBBB", "ECDBE", "CCCCB" -> (1, 9, 8, 5)
 
     - param tuple sequences: a tuple that contain the sequences of movements
     '''
@@ -233,41 +222,49 @@ def obter_pin(sequences: tuple) -> tuple:
 
 # -- Verificação de dados -- #
 
-def eh_entrada(entrada: tuple) -> bool:
+def eh_entrada(entry: tuple) -> bool:
     '''
-    WE ENDED HERE
+    This function receives a tuple and return a boolean, False if the entry have something wrong, True otherwise.
+    Example: ("a-b-c-d-e-f-g-h", "[xxxxx]", (950,300)), -> True; ("a-b-c-d-e-f-g-h-2", "[abcde]", (950,300)) -> False
+
+    - param tuple entry: tuple that contain the information that we are going to check
     '''
 
-    if type(entrada) != tuple or len(entrada) != 3:
+    if type(entry) != tuple or len(entry) != 3:
         return False
 
     #initialize variables
-    cifra = entrada[0]
-    checksum = entrada[1]
-    tuplo = entrada[2]
+    cifra = entry[0]
+    checksum = entry[1]
+    tuplo = entry[2]
 
 
     segments = cifra.split("-")
 
-    #alpha and low case check
-    for segment in segments:
-        if segment == "":
-            return False
-
-        for letter in segment:
-            if not letter.isalpha() or not letter.islower():
+    #I am using step=2 so we skip the slashes that divide the letters
+    if type(cifra) == str: #AQUI: ainda que o enunciado nao tenha pedido eu achei por bem colocar esta verificação
+        for segment in segments:
+            #here I am checking if the segment in the cifra only contain letters and is lower case
+            #this also verify's if the segment is "", this would happen if there is two slashes "--" in a row
+            if not segment.isalpha() or not segment.islower():
                 return False
+    else:
+        return False
 
     #checksum check
     if type(checksum) == str and len(checksum) == 7 and checksum[0] == "[" and checksum[-1] == "]":
-        for letter in checksum[1:-1]:
-            if not letter.isalpha() or not letter.islower():
-                return False
+        #get the caracters inside the "[", "]"
+        control_caracters = checksum[1:-1]
+
+        #check if that caracters are letters and are in lower case
+        if not control_caracters.isalpha() or not control_caracters.islower():
+            return False
     else:
         return False
 
     #tuplo check
     if type(tuplo) == tuple and len(tuplo) >= 2:
+        #check if every element of the tuple is an positive intenger
         for elemento in tuplo:
             if type(elemento) != int or elemento < 0:
                 return False
@@ -277,60 +274,74 @@ def eh_entrada(entrada: tuple) -> bool:
     #otherwise
     return True 
 
-def validar_cifra(cifra:str, checksum:str):
-    
-    control = checksum[1:-1]
+def validar_cifra(cifra:str, checksum:str) -> bool:
+    '''
+    This function returns a boolean, True if the control caracters on the checksum correspond to the first 5 letters sorted by number of occurence and undrawing by alphabetic order
+    Example: "a-b-c-d-e-f-g-h", "[abcde]" -> True; "a-b-c-d-e-f-g-h", "[xxxxx]" -> False
+
+    - param str cifra: string that we are going to run the sort algorithm on
+    - param str checksum: contains the control caracters inside "[]" 
+    '''
+
+
+    #get the control caracters [xxxxxx]
+    control_caracters = checksum[1:-1]
+
+    #AQUI: substitui isto e anda de 2 em 2 no for loop?!?!?!
     joined_cifra = cifra.replace("-", "")
 
+    #initialize an empty list to save the "best" letters in the cifra
     ordered = []
 
     #we want the 5 letters that are the most common and undraw by alphabetic order
     for _ in range(5):
         #start by defining a list that contains on the index 0 the best letter and on the index 1 the number of times that the letter appeared
+        #0 because any letter that we are going throught will appear at least 1 time so we are just initializing this 
         best = ["", 0]
-        for letter in joined_cifra:
 
+        for letter in joined_cifra:
             #number of times the letter we are testing appear on the string
             letter_count = joined_cifra.count(letter)
-            
+
+            #check if the letter appeared more times than the current best    
             if letter_count > best[1]:
                 best = [letter, letter_count]
+            
+            #if the number of ocurrences of the current letter is equal to the best letter undraw by alphabetic order
             elif letter_count == best[1]:
                 if ord(letter) < ord(best[0]):
                     best = [letter, letter_count]
 
-        #add to the list the best caracter
+        #add to the list the best caracter 
         ordered.append(best[0])
 
-        #remove the caracter that we just added from the strings
-        joined_cifra = joined_cifra.replace(best[0], "")
+        #remove the letter from the joined_cifra so we do not need to go through that letter  again since we already ordenated it (increasing the performance of the algorithm)
+        joined_cifra =  joined_cifra.replace(best[0], "")
 
+
+    ordered_string = "".join(ordered)
 
     #check if the control list correspond to the best order list and return boolean
-    result = list(control) == ordered 
+    result = control_caracters == ordered_string
 
     return result
 
+def filtrar_bdb(entries: list) -> list:
+    '''
+    This function receives a list containing "entries" and return a list containing the ones that had wrong cifras (based on the checksum).
+    Example: [("aaaaa-bbb-zx-yz-xy", "[abxyz]", (950,300)), ("a-b-c-d-e-f-g-h", "[abcde]", (124,325,7)), ("entry-muito-errada", "[abcde]", (50,404))] -> [("entry-muito-errada", "[abcde]", (50,404))]
+    '''
 
-def filtrar_bdb(entradas: list):
-
-    if type(entradas) != list or len(entradas) < 1:
+    #verify if "entries" is a list and if his len is greater than 0  
+    if type(entries) == list and len(entries) > 0:
+        #go through the entries and check if they are correct, if there is any incorrect raise the ValueError
+        for entry in entries:
+            if not eh_entrada(entry):
+                raise ValueError("filtrar_bdb: argumento invalido")
+    else:
         raise ValueError("filtrar_bdb: argumento invalido")
 
-    #is this supposed to be here?
-    for entrada in entradas:
-        if not eh_entrada(entrada):
-            raise ValueError("filtrar_bdb: argumento invalido")
-
-    #define the filter function
-    def filter_funct(entrada):
-
-        #validar_cifra will return True if the cifra is correct but because we want the ones that are not correct we need to "change" the boolean so the filter function returns True if the cifra is not valid
-        res = not validar_cifra(entrada[0], entrada[1])
-
-        return res
-
-    filtered_list = list(filter(filter_funct, entradas))
+    filtered_list = [entry for entry in entries if not validar_cifra(entry[0], entry[1])]
 
     return filtered_list
 
@@ -339,10 +350,20 @@ def filtrar_bdb(entradas: list):
 
 # -- Desencriptação de dados -- #
 
-def obter_num_seguranca(tuplo: tuple):
+def obter_num_seguranca(tuplo: tuple) -> int:
+    '''
+    This function receive a tuple containing positive intengers and return a intenger that correspond to the lowest number possibly achievable by subtracting a number in the tuple by other number in the tuple (except it self).
+    Example: (2223,424,1316,99) -> 325
+    '''
+
+    #start by defining security number has +infinit so that we can for sure have anything lower than +inf
     security_number = float("+inf")
 
+    #AQUI: é melhor usar range e dentro do loop tirar os valores dos numeros ou usar enumerate é a forma mais performatica visto que assim tenho logo o index e o numero
+
+    #go through the numbers in the tuplo and get their index and 
     for index, number in enumerate(tuplo):
+        #go once again through the numbers in the tuplo, this time this is to "calculate" all the possible subtractions with the number we are iterating in the above loop
         for sub_index, sub_number in enumerate(tuplo):
 
             #we dont want to subtract the same number with him self
@@ -358,16 +379,26 @@ def obter_num_seguranca(tuplo: tuple):
              
     return security_number
 
-def decifrar_texto(cifra: str, security: int):
+def decifrar_texto(cifra: str, security: int) -> str:
+    '''
+    This function receives a cifra and a security number and decrypts it returning the decrypted string.
+    Example: "qgfo-qutdo-s-egoes-wzegsnfmjqz", 325 -> "esta cifra e quase inquebravel"
+    '''
 
-    caracter_list = list(cifra)
+    #replace the slash with a space in the cifra
+    cifra = cifra.replace("-", " ")
+
+    #create a list containing all the caracters of the cifra, starting all encrypted they will get decrypted from the start to the end 
+    decrypted_list = list(cifra)
 
     for index_caracter, caracter in enumerate(cifra):
-        if caracter == "-":
+
+        #if the caracter is a whitespace or any other non alphabetic caracter skip iteration
+        if not caracter.isalpha():
             continue
 
-        #convert the letter to a number and subtract 96 to get a (1 to 26) order
-        alphabet_number = ord(caracter) - 96 
+        #convert the letter to a number (ASCII CODE) and subtract 96 to get a (1 to 26) order
+        alphabet_number = ord(caracter) - ord("a")
 
         #if the caracter is in a even index in the string add 1 otherwise subtract 1
         if index_caracter % 2 == 0:
@@ -378,41 +409,50 @@ def decifrar_texto(cifra: str, security: int):
         #add security code
         alphabet_number += security
 
-        #get the number to the interval 1-26
-        alphabet_number %= 26
+        #"cycle" through the alphabet and get a number between 0-25
+        alphabet_number %= 26 #cycle throught the alphabet
 
-        #add 96 to get the alphabet number to the correct utf8 and then convert back to the correspondent letter
-        new_caracter = chr(alphabet_number + 96)
+        #add 96 to get the alphabet number to the correct ascii code and then convert back to the correspondent letter
+        new_caracter = chr(alphabet_number + ord("a"))
 
-        #update the caracter in the list
-        caracter_list[index_caracter] = new_caracter
+        #update/decrypt the letter in the list
+        decrypted_list[index_caracter] = new_caracter
 
-    #join the caracters of the list again and then replace the "-" with a white space
-    final_string = "".join(caracter_list).replace("-", " ")
+    #join the caracters of the list again
+    decrypted_string = "".join(decrypted_list)
 
-    return final_string
+    return decrypted_string
 
-def decifrar_bdb(entradas: list):
-    if type(entradas) != list or len(entradas) < 1: 
+def decifrar_bdb(entries: list) -> list:
+    '''
+    This function receives a list containing entries each entry containing a cifra, a checksum and a tuple containing the digits that will be used to calculate the security code and return a list with all the correspondent cifras decrypted
+    '''
+    if type(entries) == list and len(entries) > 0: 
+        #check if we have only entries
+        for possible_entry in entries:
+            if not eh_entrada(possible_entry):
+                raise ValueError("decifrar_bdb: argumento invalido")
+    else:
         raise ValueError("decifrar_bdb: argumento invalido")
-
-    #check if we have only entries
-    for possible_entrada in entradas:
-        if not eh_entrada(possible_entrada):
-            raise ValueError("decifrar_bdb: argumento invalido")
 
     #initialize decrypted list where we are going to save our decrypted entries
     decrypted_list = []
 
-    for entrada in entradas:
-        cifra = entrada[0]
-        controlo = entrada[1]
-        security_segment = entrada[2]
+    for entry in entries:
 
+        #get the values from the entry
+        cifra = entry[0]
+        controlo = entry[1]
+        security_segment = entry[2]
+
+        #calculate the security code
         security_code = obter_num_seguranca(security_segment)
 
-        decrypted_list.append(decifrar_texto(cifra, security_code))
+        #decrypt the cifra using the security code
+        decrypted_cifra = decifrar_texto(cifra, security_code)
 
+        #append the decrypted cifra to the list
+        decrypted_list.append(decrypted_cifra)
 
     return decrypted_list
 
@@ -421,19 +461,40 @@ def decifrar_bdb(entradas: list):
 
 # -- Depuração de senhas -- #
 
-def eh_utilizador(dictionary: dict):
+def eh_utilizador(dictionary: dict) -> bool:
+    '''
+    This function receives a dictionary and returns a boolean, True if the dictionary follow every rule, False othewise
 
-    #verify the type of the argument
-    if type(dictionary) != dict or len(dictionary) != 3: 
-        return False
+    Example: [("qgfo-qutdo-s-egoes-wzegsnfmjqz", "[abcde]", (2223,424,1316,99)), ("lctlgukvzwy-ji-xxwmzgugkgw", "[abxyz]", (2388, 367, 5999)), ("nyccjoj-vfrex-ncalml", "[xxxxx]", (50, 404))] -> ["esta cifra e quase inquebravel", "fundamentos da programacao", "entrada muito errada"]
+    '''
 
-    #verify if we have all the keys
-    try:
-        name = dictionary["name"]
-        passw = dictionary["pass"]
-        vals = dictionary["rule"]["vals"]
-        char = dictionary["rule"]["char"]
-    except:
+    #verify the type and len of the dictionary
+    if type(dictionary) == dict or len(dictionary) == 3: 
+        #get the keys of the dictionary
+        dictionary_keys = dictionary.keys()
+        
+        #verify if we have the keys "name", "pass" and "rule"
+        if "name" in dictionary_keys and "pass" in dictionary_keys and "rule" in dictionary_keys:
+
+            #create the variables that I will use
+            name = dictionary["name"]
+            passw = dictionary["pass"]
+
+            #get the rules keys
+            dictionary_rule_keys = dictionary["rule"].keys()
+
+            #check val and char
+            if "char" in dictionary_rule_keys and "vals" in dictionary_rule_keys:
+                #create the variables that will be used
+                char = dictionary["rule"]["char"]
+                vals = dictionary["rule"]["vals"]
+
+            else:
+                return False
+            
+        else:
+            return False
+    else:
         return False
 
     #verify types of the keys
@@ -452,72 +513,72 @@ def eh_utilizador(dictionary: dict):
     if type(vals[0]) != int or type(vals[1]) != int or vals[0] < 1 or vals[1] < 1 or vals[0] > vals[1]:
         return False
     
-    #else
     return True
 
-def eh_senha_valida(password: str, rule: dict):
-    #gerais
+def eh_senha_valida(password: str, rule: dict) -> bool:
+    '''
+    This function receives a password and a individual rule and checks if the password follows the general rules and the individual rules, returning a boolean.
+
+    Example: "aabcde", {"vals": (1,3), "char":"a"} -> True
+    '''
 
     vowels = ("a", "e", "i", "o", "u")
 
     #initialize variable that stores the number of vowels that are present in the password
     vowels_number = 0
 
-    #initialize variable that stores a boolean corresponding to the result of the sequence rule pass
-    sequence_check = False
+    #initialize variable that stores a boolean, password have at least 1 letter that appears twice in a row or not
+    two_followed = False
 
-    #loop through the caracters
     for caracter in password:
         #count the vowels
         if caracter.islower() and caracter in vowels:
             vowels_number += 1
 
         #check if the caracter appears twice or more in a row int the password
-        if password.count(caracter*2) > 0:
-            sequence_check = True
+        if not two_followed:
+            if password.count(caracter*2) > 0:
+                two_followed = True
 
-    #if the password did not pass the general return False, otherwise continue to individual checks
-    if vowels_number < 3 or not sequence_check:
+    #general check
+    if vowels_number < 3 or not two_followed:
         return False
 
-
     #define individual variables
-    individual_caracter = rule["char"]
-    individual_min = rule["vals"][0]
-    individual_max = rule["vals"][1]
+    char = rule["char"]
+    char_min = rule["vals"][0]
+    char_max = rule["vals"][1]
 
-    #actually check if we passed the individual rules
-    if individual_max >= password.count(individual_caracter) >= individual_min:
-        return True
+    #individual check
+    if not(char_max >= password.count(char) >= char_min):
+        return False
+
+    return True
+
+def filtrar_senhas(lista: list) -> list:
+    '''
+    This function receives a list containing bdb entries (dicitonaries) and returns an alphabetic sorted list with the names of the users with wrong passwords
+
+    Example: [{"name":"john.doe", "pass":"aabcde", "rule":{"vals":(1,3), "char":"a"}}, {"name":"jane.doe", "pass":"cdefgh", "rule":{"vals":(1,3), "char":"b"}}, {"name":"jack.doe", "pass":"cccccc", "rule":{"vals":(2,9), "char":"c"}}] -> ["jack.doe", "jane.doe"]
+    '''
+
+    if type(lista) == list and len(lista) > 0:
+        #check if we have any wrong dictionary in this list
+        for dictionary in lista:
+            if not eh_utilizador(dictionary):
+                raise ValueError("filtrar_senhas: argumento invalido")
     else:
-        return False 
-
-def filtrar_senhas(lista: list):
-    if type(lista) != list or len(lista) < 1:
         raise ValueError("filtrar_senhas: argumento invalido")
 
-    #check if we have any wrong dictionary in this list
-    for dictionary in lista:
-        if not eh_utilizador(dictionary):
-            raise ValueError("filtrar_senhas: argumento invalido")
-    
+    #filter, remove the dictionaries that aren't wrong using list comprehension
+    filtered_dictionaries = [dictionary for dictionary in lista if not eh_senha_valida(dictionary["pass"], dictionary["rule"])]
 
-    def filter_funct(dictionary):
-        #since the eh_senha_valida return True if it is correct we return the opposite of the received boolean, because we want the wrong 
-        return not eh_senha_valida(dictionary["pass"], dictionary["rule"])
-
-    def map_funct(dictionary):
-        return dictionary["name"]
-
-    #here we have only the dictionaries that are "wrong"
-    filtered_dictionaries = list(filter(filter_funct, lista))
-
-    #get only the names present on that dictionaries
-    names = list(map(map_funct, filtered_dictionaries))
+    #map, get only the names for each dictionary using list comprehension
+    names = [dictionary["name"] for dictionary in filtered_dictionaries]
 
     #ordenate the names by alphabetic order
-    ordenated_names = sorted(names)
+    sorted_names = sorted(names)
 
-    return ordenated_names
+    return sorted_names
 
 #---------------------------#
