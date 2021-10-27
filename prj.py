@@ -50,11 +50,8 @@ def eh_anagrama(segment1: str, segment2: str) -> bool:
     segment1 = segment1.lower()
     segment2 = segment2.lower()
 
-    if segment1 != segment2:
     #use the built-in sorted method to "create" a sorted list of the letters and compare the lists 
-        return sorted(segment1) == sorted(segment2)
-    else:
-        return False
+    return sorted(segment1) == sorted(segment2)
 
 def corrigir_doc(string: str) -> str:
     '''
@@ -80,14 +77,14 @@ def corrigir_doc(string: str) -> str:
     for bugged_segment in bugged_segments:
         clean_current_segment = corrigir_palavra(bugged_segment)
 
-        #TODO: se os anagrams returnarem True para palavras iguais entao tenho de mudar isto
-        #list comprehension to check if there is any word that is an anagram with the word that we just cleaned, if any return False then add the segment to the cleaned segments
-        if not any([eh_anagrama(clean_segment, clean_current_segment) for clean_segment in clean_segments]):
+        #list comprehension to check if there is any word that is an anagram and is not equal with the word that we are going through, if "not any" return False then add the segment to the cleaned segments
+        if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_current_segment.lower() != clean_segment.lower() for clean_segment in clean_segments]):
             clean_segments.append(clean_current_segment)
 
     cleaned_string = " ".join(clean_segments)
 
     return cleaned_string
+
 #--------------------------------#
 
 
@@ -240,7 +237,6 @@ def validar_cifra(cifra:str, checksum:str) -> bool:
     "a-b-c-d-e-f-g-h", "[abcde]" -> True; "a-b-c-d-e-f-g-h", "[xxxxx]" -> False
     '''
 
-
     #get the caracters inside the "[", "]"
     control_caracters = checksum[1:-1]
 
@@ -275,8 +271,6 @@ def validar_cifra(cifra:str, checksum:str) -> bool:
 
     ordered_string = "".join(ordered)
 
-
-    #AQUI: não era melhor so passar isto para baixo inves de estar a criar uma varivel nova?
     result = control_caracters == ordered_string
 
     return result
@@ -387,6 +381,7 @@ def decifrar_bdb(entries: list) -> list:
     Examples:
     [("qgfo-qutdo-s-egoes-wzegsnfmjqz", "[abcde]", (2223,424,1316,99)), ("lctlgukvzwy-ji-xxwmzgugkgw", "[abxyz]", (2388, 367, 5999)), ("nyccjoj-vfrex-ncalml", "[xxxxx]", (50, 404))] -> ["esta cifra e quase inquebravel", "fundamentos da programacao", "entrada muito errada"]
     '''
+
     if type(entries) != list or len(entries) == 0: 
         raise ValueError("decifrar_bdb: argumento invalido")
 
@@ -395,6 +390,7 @@ def decifrar_bdb(entries: list) -> list:
 
     for entry in entries:
 
+        #check
         if not eh_entrada(entry):
             raise ValueError("decifrar_bdb: argumento invalido")
 
@@ -406,7 +402,6 @@ def decifrar_bdb(entries: list) -> list:
         decrypted_cifra = decifrar_texto(cifra, security_code)
 
         decrypted_list.append(decrypted_cifra)
-
 
     return decrypted_list
 
@@ -485,9 +480,9 @@ def eh_senha_valida(password: str, rule: dict) -> bool:
             if password.count(caracter*2) > 0:
                 two_followed = True
 
+
     if vowels_count < 3 or not two_followed:
         return False
-
 
     #individual checks
     char = rule["char"]
@@ -517,11 +512,8 @@ def filtrar_senhas(lista: list) -> list:
         if not eh_utilizador(dictionary):
             raise ValueError("filtrar_senhas: argumento invalido")
 
-    #filter, remove the dictionaries that aren correct using list comprehension
-    filtered_dictionaries = [dictionary for dictionary in lista if not eh_senha_valida(dictionary["pass"], dictionary["rule"])]
-
-    #map, get only the names for each dictionary using list comprehension
-    names = [dictionary["name"] for dictionary in filtered_dictionaries]
+    #AQUI: Eu posso dar join destas 2 e fazer uma unica list comprehension
+    names = [dictionary["name"] for dictionary in lista if not eh_senha_valida(dictionary["pass"], dictionary["rule"])]
 
     #ordenate the names by alphabetic order
     sorted_names = sorted(names)
