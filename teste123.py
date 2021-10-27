@@ -10,7 +10,17 @@ def num_occ_lista(lista, num):
             if element == num:
                 times += 1
 
-    print(times)
+    #print(times)
 
 
 num_occ_lista([1, 2, 3, 4, 3], 3)
+
+
+
+
+
+
+
+
+
+

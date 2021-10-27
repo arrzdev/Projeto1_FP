@@ -1,13 +1,23 @@
+'''
+In this project we are creating some functions to fix the problems in (Buggy Data Base, BDB).
+We made a total of 15 functions (3 functions for each problem).
+André Filipe Silva Santos
+ist1103597
+
+https://github.com/arrzdev
+'''
+
 # -- Correção de documentação -- #
 
 def corrigir_palavra(segment: str) -> str: 
     '''
     This function "cleans" a segment
     
-    This function receives a segment of caracters with some "errors" and cleans it
+    This function receives a segment of caracters with some "errors" and cleans it.
+    By errors we consider sequences of the same two caracters with different cases one lower and one upper, for example "Aa", "aA".
 
     - segment: str
-    \n\tsegment/word that are incorrect and need to be fixed
+    \n\tSegment that is incorrect and need to be "cleaned"
     
     Examples:
     "cCdatabasacCADde" -> "database"
@@ -35,11 +45,16 @@ def corrigir_palavra(segment: str) -> str:
 
 def eh_anagrama(segment1: str, segment2: str) -> bool:
     '''
-    Function to check if two segments of caracters are anagrams
+    Function to check if two segments of caracters are anagrams.
     
     This function check if two segments are anagrams returning a boolean.
     True if the segment1 and segment2 are anagrams, False other wise.
     This function is case insensitive.
+
+    - segment1: str
+    \n\tOne of the segments that will be compared
+    - segment2: str
+    \n\tOne of the segments that will be compared
 
     Examples:
     "Caso", "Saco" -> True; 
@@ -56,6 +71,9 @@ def eh_anagrama(segment1: str, segment2: str) -> bool:
 def corrigir_doc(string: str) -> str:
     '''
     This function receives a string containing segments separated by a space. This segments can contain trash so we "send" each segment to the function corrigir_palavra() and after cleaning all of the segments join them together (basically removing all the trash in the received string), we exclude from the segments that will be joined the ones that are anagrams of any segment that is present before them (we dont consider equal segments anagrams).
+
+    - string: str
+    \n\tString containing one or more segments that will be fixed
 
     Example: "JlLjbaoOsuUeYy cChgGvValLCwMmWBbclLsNn" -> "base has"
     '''
@@ -94,8 +112,10 @@ def obter_posicao(movement: str, position: int) -> int:
     '''
     This function receives a position and a movement and returns the position after "moving", here we consider "C" as going Up, "B" as going down, "E" as going left and "D" as going right. If we are on the edge of the board we stay in the same place.
     
-    - param str movement: "type" of moving we are making
-    - param int position: position on the board that we are moving from
+    - movement: str 
+    \n\tString containing one of the possible moves ("E", "D", "B", "C")
+    - position: int
+    \n\tThis parameter contain the position that we are moving from
     
     Examples:
     "C", 5 -> 2;
@@ -122,10 +142,12 @@ def obter_posicao(movement: str, position: int) -> int:
 
 def obter_digito(sequence: str, position: int) -> int:
     '''
-    This function receives a sequence of movements and a starting position and return the position that we end with after all the moves.
+    This function receives a sequence of movements and a starting position and return the position that we end with after making all the moves.
     
-    - param str sequence: sequence of movements that will be looped through to get the last position
-    - param int position: starting position
+    - sequence: str
+    \n\tSequence of movements that will be made
+    - position: int
+    \n\tposition: Starting position
     
     Examples:
     "CEE", 5 -> 1
@@ -140,7 +162,8 @@ def obter_pin(sequences: tuple) -> tuple:
     '''
     This function receives some sequences of movements and returns a pin, each sequence corresponds to 1 digit in the pin.
     
-    - param tuple sequences: a tuple that contain the sequences of movements
+    - sequences: tuple
+    \n\Tuple that contain the sequences of movements
     
     Examples: 
     "CEE", "DDBBB", "ECDBE", "CCCCB" -> (1, 9, 8, 5)
@@ -183,7 +206,14 @@ def eh_entrada(entry: tuple) -> bool:
     '''
     This function receives a tuple and return a boolean, False if the entry have something wrong, True otherwise.
 
-    - param tuple entry: tuple that contain the information that we are going to check
+    PARAMETERS
+    ----------
+    - entry: tuple
+    \n\tTuple that contain the information that we are going to check, contains a string with single caracteres divided by "-", a string (checksum) containing 5 digits of control inside square brackets "[]" and a tuple with two or more positive intengers.
+
+    RETURN
+    ------
+
 
     Examples: 
     ("a-b-c-d-e-f-g-h", "[xxxxx]", (950,300)), -> True; ("a-b-c-d-e-f-g-h-2", "[abcde]", (950,300)) -> False
