@@ -1,6 +1,7 @@
 '''
-In this project we are creating some functions to fix the problems in (Buggy Data Base, BDB).
-We made a total of 15 functions (3 functions for each problem).
+In this project I coded some functions to fix the problems in \
+Buggy Data Base (BDB).
+I made a total of 15 functions (3 functions for each problem).
 André Filipe Silva Santos
 ist1103597
 
@@ -11,32 +12,41 @@ https://github.com/arrzdev
 
 def corrigir_palavra(segment: str) -> str: 
     '''
-    This function "cleans" a segment
+    This function "cleans" a segment.
     
-    This function receives a segment of caracters with some "errors" and cleans it.
-    By errors we consider sequences of the same two caracters with different cases one lower and one upper, for example "Aa", "aA".
+    This function receives a string of characters that represents a word (potentially \
+    modified by an outbreak of letters) and returns the string that corresponds \
+    to the application of the sequence of reductions.
 
+    PARAMETERS
+    ----------
+    - segment: str 
+    \n\tString that is incorrect and need to be "cleaned"
+
+    RETURN
+    ------
     - segment: str
-    \n\tSegment that is incorrect and need to be "cleaned"
+    \n\tString that was cleaned 
     
-    Examples:
+    EXAMPLES
+    --------
     "cCdatabasacCADde" -> "database"
     '''
 
     letter_index = 0
 
-    #len(segment) - 1 so we do not go through the last letter since we don't have any letter after it
+    #len(segment) - 1 so we don't check the last letter
     while letter_index < len(segment)-1:
         
         current_letter = segment[letter_index]
         next_letter = segment[letter_index+1]
 
-        #converting both letters to the correspondent ASCII code and then checking if the modulo of the difference is the difference between "a" and "A" in ASCII (difference between lower and capital letters: 32)
+        #checking if the difference between the ascii code of the two letters correspond to the difference between two letter with diferent "cases" in modulo... (32)
         if abs(ord(current_letter) - ord(next_letter)) == ord("a") - ord("A"):
             letters_to_remove = current_letter + next_letter
             segment = segment.replace(letters_to_remove, "")
             
-            #when we fix something subtract 1 to the letter index to check the last letter again (example: abBA, when we clean "bB", "aA" is "created")
+            #when we change something in the string subtract 1 to the letter index, so we check if there is some new "pattern" that was created ex:(ABba)
             letter_index -= 1
         else:
             letter_index += 1
@@ -45,37 +55,65 @@ def corrigir_palavra(segment: str) -> str:
 
 def eh_anagrama(segment1: str, segment2: str) -> bool:
     '''
-    Function to check if two segments of caracters are anagrams.
-    
-    This function check if two segments are anagrams returning a boolean.
-    True if the segment1 and segment2 are anagrams, False other wise.
-    This function is case insensitive.
+    This function receives two strings of characters corresponding to two words \
+    and returns True if and only if one is anagram of the other, that is, if the \
+    words are constituted by the same letters, ignoring differences between upper \
+    and lowercase and the order between characters.
 
+    PARAMETERS
+    ----------
     - segment1: str
-    \n\tOne of the segments that will be compared
+    \n\tOne of the strings that will be compared
     - segment2: str
-    \n\tOne of the segments that will be compared
+    \n\tOne of the strings that will be compared
 
-    Examples:
+    RETURN
+    ------
+    - res: bool
+	\n\tBoolean, True if the two strings are anagrams, False otherwise
+
+    EXAMPLES
+    --------
     "Caso", "Saco" -> True; 
     "saco", "sacos" -> False 
     '''
 
-    #convert all letters of both segments to lower case letters
     segment1 = segment1.lower()
     segment2 = segment2.lower()
 
-    #use the built-in sorted method to "create" a sorted list of the letters and compare the lists 
-    return sorted(segment1) == sorted(segment2)
+    res = sorted(segment1) == sorted(segment2)
+    
+    return res
 
 def corrigir_doc(string: str) -> str:
     '''
-    This function receives a string containing segments separated by a space. This segments can contain trash so we "send" each segment to the function corrigir_palavra() and after cleaning all of the segments join them together (basically removing all the trash in the received string), we exclude from the segments that will be joined the ones that are anagrams of any segment that is present before them (we dont consider equal segments anagrams).
+    Function that "clean" a BDB document.
+    
+    This function receives a string that represents the errored text of the BDB \
+    documentation and returns the string of characters filtered with the \
+    corrected words and the anagrams removed, leaving only their first \
+    occurrence. Anagrams are evaluated after word correction and only anagrams \
+    that correspond to different words are removed (sequence of characters other \
+    than previous words ignoring case differences). 
+    This function check the validity of its argument by raising a \
+    ValueError with the message "correct doc: argumento invalido" if its \
+    argument isn't valid.
 
+    PARAMETERS
+    ----------
     - string: str
-    \n\tString containing one or more segments that will be fixed
-
-    Example: "JlLjbaoOsuUeYy cChgGvValLCwMmWBbclLsNn" -> "base has"
+    \n\tThe words in this string can only be separated by a single space, the string \
+    is formed by one or more words, and each word is formed by at least 1 letter \
+    (case independent)
+   
+    RETURN
+    ------
+    - cleaned_string: str
+    \n\tString that was cleaned
+   
+    EXAMPLES
+    --------
+    "JlLjbaoOsuUeYycChgGvValLCwMmWBbclLsNn" -> "base has"
     '''
 
     if type(string) != str or len(string) == 0:
@@ -95,7 +133,11 @@ def corrigir_doc(string: str) -> str:
     for bugged_segment in bugged_segments:
         clean_current_segment = corrigir_palavra(bugged_segment)
 
-        #list comprehension to check if there is any word that is an anagram and is not equal with the word that we are going through, if "not any" return False then add the segment to the cleaned segments
+        '''
+        Check if there is any word that is an anagram and isn't equal with the word \
+        that we are going through (since here we consider that equal words are not \
+        anagrams), if there isn't any anagram we add the segment to the clean segments list
+        '''
         if not any([eh_anagrama(clean_segment, clean_current_segment) and clean_current_segment.lower() != clean_segment.lower() for clean_segment in clean_segments]):
             clean_segments.append(clean_current_segment)
 
@@ -110,16 +152,36 @@ def corrigir_doc(string: str) -> str:
 
 def obter_posicao(movement: str, position: int) -> int:
     '''
-    This function receives a position and a movement and returns the position after "moving", here we consider "C" as going Up, "B" as going down, "E" as going left and "D" as going right. If we are on the edge of the board we stay in the same place.
+    This function receives a string of characters containing only one character \
+    that represents the direction of a single movement ("C", "B", "E" or "D") and \
+    an integer representing the current position (1, 2, 3, 4, 5, 6, 7, 8 or 9); \
+    and returns the integer that corresponds to the new position after movement.  
     
+    PARAMETERS
+    ----------
     - movement: str 
     \n\tString containing one of the possible moves ("E", "D", "B", "C")
     - position: int
     \n\tThis parameter contain the position that we are moving from
     
-    Examples:
+    RETURN
+    ------
+    - new_position: int
+    \n\tPosition that we got after making (or not in case of an edge move..) the move.
+    
+    EXAMPLES
+    --------
     "C", 5 -> 2;
     "E", 4 -> 4;
+    '''
+
+    '''
+    BOARD:
+    |-----------|
+    | 1   2   3 |
+    | 4   5   6 |
+    | 7   8   9 |
+    |-----------|
     '''
 
     new_position = position
@@ -142,14 +204,24 @@ def obter_posicao(movement: str, position: int) -> int:
 
 def obter_digito(sequence: str, position: int) -> int:
     '''
-    This function receives a sequence of movements and a starting position and return the position that we end with after making all the moves.
-    
+    This function receives a string containing a sequence of one or more movements \
+    and an integer representing the starting position, and returns the integer that \
+    corresponds to the digit to be marked after finishing all movements. 
+
+    PARAMETERS
+    ----------
     - sequence: str
     \n\tSequence of movements that will be made
     - position: int
     \n\tposition: Starting position
     
-    Examples:
+    RETURN
+    ------
+    - position: int
+    \n\t The position that we end with after making all the moves
+
+    EXAMPLES
+    --------
     "CEE", 5 -> 1
     '''
  
@@ -160,12 +232,26 @@ def obter_digito(sequence: str, position: int) -> int:
 
 def obter_pin(sequences: tuple) -> tuple:
     '''
-    This function receives some sequences of movements and returns a pin, each sequence corresponds to 1 digit in the pin.
+    This function receives a tuple containing between 4 and 10 sequences of \
+    movements and returns a tuple of integers containing the pin according to \
+    the tuple containing the movements.
+    This function verify's the validity of its argument, this is, a tuple \
+    containing between 4 and 10 sequences of movements, each sequence with 1 or \
+    more characters, "C", "B", "E" or "D"), generating a ValueError \
+    with the message "obter_pin: argumento invalido" if its argument isn't valid.
     
+    PARAMETERS
+    ----------
     - sequences: tuple
-    \n\Tuple that contain the sequences of movements
+    \n\tTuple that contain the sequences of movements
     
-    Examples: 
+    RETURN
+    ------
+    - pin: tuple
+    \n\tTuple containing the digits of the pin
+
+    EXAMPLES
+    -------- 
     "CEE", "DDBBB", "ECDBE", "CCCCB" -> (1, 9, 8, 5)
     '''
 
@@ -204,25 +290,28 @@ def obter_pin(sequences: tuple) -> tuple:
 
 def eh_entrada(entry: tuple) -> bool:
     '''
-    This function receives a tuple and return a boolean, False if the entry have something wrong, True otherwise.
+    This function receives an argument of any type and returns True if and only \
+    if its argument corresponds to an entry from BDB (potentially corrupted), this is \
+    a tuple with 3 fields: a cipher, a control sequence, and a security code.
 
     PARAMETERS
     ----------
-    - entry: tuple
-    \n\tTuple that contain the information that we are going to check, contains a string with single caracteres divided by "-", a string (checksum) containing 5 digits of control inside square brackets "[]" and a tuple with two or more positive intengers.
+    - entry: universal
+    \n\tArgument that will be checked
 
     RETURN
     ------
+    boolean, True if it is a entry of BDB, False otherwise
 
-
-    Examples: 
-    ("a-b-c-d-e-f-g-h", "[xxxxx]", (950,300)), -> True; ("a-b-c-d-e-f-g-h-2", "[abcde]", (950,300)) -> False
+    EXAMPLES
+    -------- 
+    ("a-b-c-d-e-f-g-h", "[xxxxx]", (950,300)), -> True\n
+    ("a-b-c-d-e-f-g-h-2", "[abcde]", (950,300)) -> False
     '''
 
     if type(entry) != tuple or len(entry) != 3:
         return False
 
-    #initialize variables
     cifra = entry[0]
     checksum = entry[1]
     tuplo = entry[2]
@@ -233,18 +322,16 @@ def eh_entrada(entry: tuple) -> bool:
         return False
     
     for segment in segments:
-        #already testing if the segment is "" that would happen if we have two slashes in a row "--"
         if not segment.isalpha() or not segment.islower():
             return False
 
-    #checksum check
     if type(checksum) != str or len(checksum) != 7 or checksum[0] != "[" or checksum[-1] != "]":
         return False
 
-    #get the caracters inside the "[", "]"
-    control_caracters = checksum[1:-1]
+    #get the characters inside the "[", "]"
+    control_characters = checksum[1:-1]
 
-    if not control_caracters.isalpha() or not control_caracters.islower():
+    if not control_characters.isalpha() or not control_characters.islower():
         return False
 
     if type(tuplo) != tuple or len(tuplo) < 2:
@@ -258,17 +345,30 @@ def eh_entrada(entry: tuple) -> bool:
 
 def validar_cifra(cifra:str, checksum:str) -> bool:
     '''
-    This function returns a boolean, True if the control caracters on the checksum correspond to the first 5 letters sorted by number of occurence and undrawing by alphabetic order
+    This function receives a string of characters containing a cipher and another \
+    chain of characters containing a control sequence, and returns True if and only \
+    the sequence is consistent with the cipher as described. 
 
-    - param str cifra: string that we are going to run the sort algorithm on
-    - param str checksum: contains the control caracters inside "[]" 
+    PARAMETERS
+    ----------
+    - param str cifra: 
+    \n\tstring that we are going to run the sort algorithm on
+    - param str checksum:
+    \n\tcontains the control characters inside "[]" 
     
-    Examples:
-    "a-b-c-d-e-f-g-h", "[abcde]" -> True; "a-b-c-d-e-f-g-h", "[xxxxx]" -> False
+    RETURN
+    ------
+    - result: bool
+    \n\tBoolean, True if control characters and ordered characters are equal
+
+    EXAMPLES
+    --------
+    "a-b-c-d-e-f-g-h", "[abcde]" -> True\n
+    "a-b-c-d-e-f-g-h", "[xxxxx]" -> False
     '''
 
-    #get the caracters inside the "[", "]"
-    control_caracters = checksum[1:-1]
+    #get the characters inside the "[", "]"
+    control_characters = checksum[1:-1]
 
     joined_cifra = cifra.replace("-", "")
 
@@ -277,8 +377,10 @@ def validar_cifra(cifra:str, checksum:str) -> bool:
     #we want the 5 letters that are the most common and undraw by alphabetic order
     for _ in range(5):
 
-        #start by defining a list that contains on the index 0 the best letter and on the index 1 the number of times that the letter appeared
-        #0 because any letter that we are going throught will appear at least 1 time so we are just initializing this 
+        '''
+        start by defining a list that contains on the index 0 the best letter \
+        and on the index 1 the number of times that letter appeared 
+        '''
         best = ["", 0]
 
         for letter in joined_cifra:
@@ -287,29 +389,45 @@ def validar_cifra(cifra:str, checksum:str) -> bool:
             if letter_count > best[1]:
                 best = [letter, letter_count]
             
-            #if the number of ocurrences of the current letter is equal to the best letter undraw by alphabetic order
             elif letter_count == best[1]:
+                #undraw alphabetically
                 if ord(letter) < ord(best[0]):
                     best = [letter, letter_count]
 
-        #add to the ordered list the best caracter 
+        #add to the ordered list the "best" caracter
         ordered.append(best[0])
 
-        #remove the letter from the joined_cifra so we do not go through that letter again
+        #remove the letter from the joined_cifra so we do not choose that letter again
         joined_cifra =  joined_cifra.replace(best[0], "")
 
-
+    #get the 5 best letters as a string again
     ordered_string = "".join(ordered)
 
-    result = control_caracters == ordered_string
+    result = control_characters == ordered_string
 
     return result
 
 def filtrar_bdb(entries: list) -> list:
     '''
-    This function receives a list containing "entries" and return a list containing the ones that had wrong cifras (based on the checksum).
+    This function receives a list containing one or more BDB entries and returns \
+    a list containing the entries in which the checksum isn't consistent \
+    with the corresponding cipher, in the same order as the original list.
+    This function verify's the validity of the its argument by raising a \
+    ValueError with the message 'filtrar_bdb: argumento invalido' \
+    if it's argument isn't valid.
 
-    Examples: 
+    PARAMETERS
+    ----------
+    - entries: list
+    \n\tList containing the BDB entries 
+
+    RETURN
+    ------
+    - filtered_list: list
+    \n\tList containing the wrong entries
+
+    EXAMPLE
+    -------
     [("aaaaa-bbb-zx-yz-xy", "[abxyz]", (950,300)), ("a-b-c-d-e-f-g-h", "[abcde]", (124,325,7)), ("entry-muito-errada", "[abcde]", (50,404))] -> [("entry-muito-errada", "[abcde]", (50,404))]
     '''
 
@@ -320,9 +438,7 @@ def filtrar_bdb(entries: list) -> list:
         if not eh_entrada(entry):
             raise ValueError("filtrar_bdb: argumento invalido")
 
-    #AQUI: Este comentario chega para explicar a list comprehension
-
-    #list comprehension to filter the list and get the ones that have wrong cifra's
+    #loop through the entries and keep the ones that returned False from the "validar_cifra"
     filtered_list = [entry for entry in entries if not validar_cifra(entry[0], entry[1])]
 
     return filtered_list
@@ -334,53 +450,75 @@ def filtrar_bdb(entries: list) -> list:
 
 def obter_num_seguranca(tuplo: tuple) -> int:
     '''
-    This function receive a tuple containing positive intengers and return a intenger that correspond to the lowest number possibly achievable by subtracting a number in the tuple by other number in the tuple (except it self).
+    This function receives a tuple of positive integers and returns the security \
+    number, that is, the smallest positive difference between any \
+    pair of numbers.  
     
-    Examples:
+    PARAMETERS
+    ----------
+    - tuplo: tuple
+    \n\tTuple that contain the positive intengers
+
+    RETURN
+    ------
+    - security_number: tuple
+
+    EXAMPLES
+    --------
     (2223,424,1316,99) -> 325
     '''
 
-    #start by defining security number has +infinit so that we can for sure have anything lower than +inf
+    #start with "+infinit" so that we can for sure have anything lower
     security_number = float("+inf")
-
-    #go through the numbers in the tuplo and get their index and 
+ 
     for index, number in enumerate(tuplo):
-        #go once again through the numbers in the tuplo, this time this is to "calculate" all the possible subtractions with the number we are iterating in the above loop
+        #this second loop get us all the possible combinations of a list with it self
         for subtract_index, subtract_number in enumerate(tuplo):
 
-            #we dont want to subtract the same number with him self
+            #we dont want to subtract the same number with him self so skip
             if index == subtract_index:
                 continue
 
             #using modulo to get always the subtraction that gives us the positive number
-            possible_security = abs(number - subtract_number)
+            subtraction_result = abs(number - subtract_number)
 
-            if possible_security < security_number:
-                security_number = possible_security
+            if subtraction_result < security_number:
+                security_number = subtraction_result
              
     return security_number
 
 def decifrar_texto(cifra: str, security: int) -> str:
     '''
-    This function receives a cifra and a security number and decrypts it returning the decrypted string.
-    
-    Examples:
+    This function receives a string of characters containing a cipher and a \
+    security number and returns the decyphred text as described. 
+
+    PARAMETER
+    ---------
+    - cifra: str
+    \n\tString that contain a cypher
+
+    RETURN
+    ------
+    - decrypted_cifra: str
+    \n\tString that is the decrypted cypher
+
+    EXAMPLES
+    --------
     "qgfo-qutdo-s-egoes-wzegsnfmjqz", 325 -> "esta cifra e quase inquebravel"
     '''
 
-    #replace the slash with a space in the cifra
     cifra = cifra.replace("-", " ")
 
-    #create a list that will start with all the cifra caracters encrypted and will be decrypted from the start to the end
-    decrypted_caracters = list(cifra)
+    #create a list that will start with all the cifra characters encrypted and 
+    #will be decrypted from the start to the end
+    decrypted_characters = list(cifra)
 
     for index_caracter, caracter in enumerate(cifra):
-
-        #if the caracter is a whitespace or any other non alphabetic caracter skip iteration
-        if not caracter.isalpha():
+        if not caracter.isalpha(): #this also skips white spaces
             continue
 
-        #convert the letter to a number (ASCII CODE) and subtract "ord("a")" (97) to get a (0 to 25, corresponding to the alphaber) order
+        #convert the letter to the correspondent ascii code and subtract "ord("a")" 
+        #to get a number in range (0 to 25) corresponding to the alphabet order
         alphabet_number = ord(caracter) - ord("a")
 
         if index_caracter % 2 == 0:
@@ -390,32 +528,47 @@ def decifrar_texto(cifra: str, security: int) -> str:
 
         alphabet_number += security
 
-        #"cycle" through the alphabet and get a number between in the range 0-25, example: 25 = "z"; 26 = 0 = "a"
+        #"cycle" through the alphabet and get a number in the range (0-25)
         alphabet_number %= 26 #cycle throught the alphabet
 
-        #add "ord("a")" (97) to get the alphabet number to the correct ascii code and then convert back to the correspondent letter
+        #add "ord("a")" to get the get the correspondent letter once again
         new_caracter = chr(alphabet_number + ord("a"))
 
         #update/decrypt the letter in the list
-        decrypted_caracters[index_caracter] = new_caracter
+        decrypted_characters[index_caracter] = new_caracter
 
 
-    decrypted_cifra = "".join(decrypted_caracters)
+    decrypted_cifra = "".join(decrypted_characters)
 
     return decrypted_cifra
 
 def decifrar_bdb(entries: list) -> list:
     '''
-    This function receives a list containing entries each entry containing a cifra, a checksum and a tuple containing the digits that will be used to calculate the security code and return a list with all the correspondent cifras decrypted
+    This function receives a list containing one or more BDB entries and returns \
+    a list of equal size, containing the text of the entries decrypted in the \
+    same order.
+    This function verify's the validity of it's argument by raising a ValueError \
+    with the message 'decifrar_bdb: argumento invalido' in case it's argument isn't \
+    valid.
 
-    Examples:
+    PARAMETER
+    ---------
+    - entries: list
+    \n\tList that contain the BDB entries to be decyphred.
+
+    RETURN
+    ------
+    - decrypted_list: list
+    \n\tList containing the decrypted BDB entries. 
+
+    EXAMPLES
+    --------
     [("qgfo-qutdo-s-egoes-wzegsnfmjqz", "[abcde]", (2223,424,1316,99)), ("lctlgukvzwy-ji-xxwmzgugkgw", "[abxyz]", (2388, 367, 5999)), ("nyccjoj-vfrex-ncalml", "[xxxxx]", (50, 404))] -> ["esta cifra e quase inquebravel", "fundamentos da programacao", "entrada muito errada"]
     '''
 
     if type(entries) != list or len(entries) == 0: 
         raise ValueError("decifrar_bdb: argumento invalido")
 
-    #initialize decrypted list where we are going to save our decrypted entries
     decrypted_list = []
 
     for entry in entries:
@@ -442,22 +595,32 @@ def decifrar_bdb(entries: list) -> list:
 
 def eh_utilizador(dictionary: dict) -> bool:
     '''
-    This function receives a dictionary and returns a boolean, True if the dictionary follow every rule, False othewise
+    This function receives an argument of any kind and returns True if and only \
+    if its argument corresponds to a dictionary containing the relevant user \
+    information, this is, name, password and the individual rule. 
+    Name and password must have lenght of at least 1 and can contain any caracter. 
 
-    Examples:
+    PARAMETERS
+    ----------
+    - dictionary: universal
+    \n\tArgument that will be checked, if it is a BDB entrie or not, it should be a dictionary
+
+    RETURN
+    ------
+    Bool, True if it is a dicitonary with the relevant user information, False otherwise
+
+    EXAMPLES
+    --------
     {"name":"john.doe", "pass":"aabcde", "rule":{"vals": (1,3), "char":"a"}} -> True
     '''
 
-    #verify the type and len of the dictionary
     if type(dictionary) != dict or len(dictionary) != 3: 
         return False
 
-    #verify if we have the keys "name", "pass" and "rule"
     dictionary_keys = dictionary.keys()
     if "name" not in dictionary_keys or "pass" not in dictionary_keys or "rule" not in dictionary_keys:
         return False
 
-    #check val and char
     dictionary_rule_keys = dictionary["rule"].keys()
     if "char" not in dictionary_rule_keys or "vals" not in dictionary_rule_keys:
         return False
@@ -468,19 +631,15 @@ def eh_utilizador(dictionary: dict) -> bool:
     char = dictionary["rule"]["char"]
     vals = dictionary["rule"]["vals"]
 
-    #verify types of the keys
     if type(name) != str or type(passw) != str or type(vals) != tuple or type(char) != str:
         return False
 
-    #verify lengths
     if len(name) == 0 or len(passw) == 0 or len(vals) != 2 or len(char) != 1:
         return False
 
-    #char alpha and lower case check
     if not char.isalpha():
         return False
 
-    #vals check
     if type(vals[0]) != int or type(vals[1]) != int or vals[0] < 1 or vals[1] < 1 or vals[0] > vals[1]:
         return False
     
@@ -488,29 +647,44 @@ def eh_utilizador(dictionary: dict) -> bool:
 
 def eh_senha_valida(password: str, rule: dict) -> bool:
     '''
-    This function receives a password and a individual rule and checks if the password follows the general rules and the individual rules, returning a boolean.
+    This function receives a string of characters corresponding to a password \
+    and a dictionary containing the individual password creation rule, returning True \
+    if and only if the password complies with all rules (general and individual).
 
-    Example: "aabcde", {"vals": (1,3), "char":"a"} -> True
+    PARAMETERS
+    ----------
+    - password: str
+    \n\tString that corresponds to the user password
+    - rule: dict
+    \n\tDictionary that contain the individual rules of password creation
+
+    RETURN
+    ------
+    Bool, True if the user password passed the individual and general rules, False otherwise
+
+    EXAMPLE
+    -------
+    "aabcde", {"vals": (1,3), "char":"a"} -> True
     '''
 
     vowels = ("a", "e", "i", "o", "u")
 
     vowels_count = 0
 
-    #initialize variable that stores a boolean, password have at least 1 letter that appears twice in a row or not
+    #this is the variable that says if we passed the two letters in a row check..
     two_followed = False
 
     for caracter in password:
-        #count the vowels
+
         if caracter.islower() and caracter in vowels:
             vowels_count += 1
 
-        #check if the caracter appears twice or more in a row int the password
         if not two_followed:
+            #if the caracter appear 2 times in a row in the string
             if password.count(caracter*2) > 0:
                 two_followed = True
 
-
+    #check if we passed the general rules
     if vowels_count < 3 or not two_followed:
         return False
 
@@ -519,6 +693,7 @@ def eh_senha_valida(password: str, rule: dict) -> bool:
     char_min = rule["vals"][0]
     char_max = rule["vals"][1]
 
+    #check if we passed the individual rules
     if not(char_max >= password.count(char) >= char_min):
         return False
 
@@ -526,23 +701,35 @@ def eh_senha_valida(password: str, rule: dict) -> bool:
 
 def filtrar_senhas(lista: list) -> list:
     '''
-    This function receives a list containing bdb entries (dicitonaries) and returns an alphabetic sorted list with the names of the users with wrong passwords
+    This function receives a list containing one or more dictionaries, and \
+    returns a list alphabetically ordered with the names of users with the wrong passwords. 
+    This function should verify the validity of it's argument by raising a ValueError \
+    with the message 'filtrar_senhas: argumento invalido' in case it's argument isn't valid.
 
-    Examples:
+    PARAMETERS
+    ----------
+    - lista: list
+    \n\tList containing the dictionaries
+
+    RETURN
+    ------
+    - sorted_names: list
+    \n\tList that contain the names that are wrong, alphabetically ordered
+
+    EXAMPLES
+    --------
     [{"name":"john.doe", "pass":"aabcde", "rule":{"vals":(1,3), "char":"a"}}, {"name":"jane.doe", "pass":"cdefgh", "rule":{"vals":(1,3), "char":"b"}}, {"name":"jack.doe", "pass":"cccccc", "rule":{"vals":(2,9), "char":"c"}}] -> ["jack.doe", "jane.doe"]
     '''
 
     if type(lista) != list or len(lista) == 0:
         raise ValueError("filtrar_senhas: argumento invalido")
-    
-    #AQUI: visto que faço a verificação e depois uso list comprehension para filtrar estou a repetir o mesmo loop duas vezes, vale a pena passar de list comprehension para dentro deste for ou entao levantar os erros na list comprehension se der?!?!
 
     #check if we have any wrong dictionary in this list
     for dictionary in lista:
         if not eh_utilizador(dictionary):
             raise ValueError("filtrar_senhas: argumento invalido")
 
-    #AQUI: Eu posso dar join destas 2 e fazer uma unica list comprehension
+    #loop through the dictionaries and get the name of the ones that have wrong passwords
     names = [dictionary["name"] for dictionary in lista if not eh_senha_valida(dictionary["pass"], dictionary["rule"])]
 
     #ordenate the names by alphabetic order
