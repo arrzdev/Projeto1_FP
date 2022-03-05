@@ -1,4 +1,4 @@
-# Buggy Data Base (BDB)
+# Buggy Data Base (BDB) - Python Project
 ## Evaluation: 19,15 / 20
 
 ### Automatic Evaluation (tests): 16 / 16
